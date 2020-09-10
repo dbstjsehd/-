@@ -446,7 +446,7 @@ namespace 바람연
 
                 if (searchIMG(repairBmp,수리bmp,ref tempPt) > 0.8)
                 {
-                    Debug.WriteLine("수리 필요");
+                    
                     mouseLeftClick(handlePtr, tempPt.X + 수리RECT.left, tempPt.Y + 수리RECT.top);          // 수리 버튼 클릭
                     Delay(1000);
                     자동이동대기();
@@ -508,7 +508,7 @@ namespace 바람연
             {
                 mouseLeftClick(handlePtr, 782, 212);
                 Delay(3000);
-                Debug.Write("도감 완료 클릭");
+                
             }
 
 
@@ -545,7 +545,7 @@ namespace 바람연
                 Bitmap tempBmp = getBmp(handlePtr);
                 if(searchIMG(tempBmp,도감장소bmp,ref tempPt) > 0.9)
                 {
-                    Debug.WriteLine("도감찾음");
+                    
                     Delay(1000);
                     Bitmap tempBmp2 = getBmp(handlePtr);
                     if(searchIMG(tempBmp2,도감장소bmp,ref tempPt) > 0.9)
@@ -560,7 +560,7 @@ namespace 바람연
                         Bitmap tempBmp3 = cropImage(tempBmp2, 하위RECT);
                         if(searchIMG(tempBmp3,하위목록bmp,ref tempPt) > 0.8)
                         {
-                            Debug.WriteLine("하위목록 찾음");
+                            
                             mouseLeftClick(handlePtr, 393, tempPt.Y+하위RECT.top);
                             Delay(2000);
 
@@ -719,7 +719,7 @@ namespace 바람연
                     OpenCvSharp.Point minloc, maxloc;
                     //찾은 이미지의 유사도 및 위치 값을 받습니다. 
                     Cv2.MinMaxLoc(res, out minval, out maxval, out minloc, out maxloc);
-                    Debug.WriteLine("찾은 이미지의 유사도 : " + maxval);
+                    
 
                     //이미지를 찾았을 경우 클릭이벤트를 발생!!
                     pt.X = maxloc.X;
