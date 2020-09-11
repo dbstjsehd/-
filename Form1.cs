@@ -503,13 +503,17 @@ namespace 바람연
             Delay(1000);
             mouseLeftClick(handlePtr, 727, 356);            // 도감 클릭;
             Delay(5000);
-
-            for (int i = 0; i < 5; i++)
+            if (searchIMG(tempBmp, 완성bmp, ref tempPt) > 0.8)
             {
-                mouseLeftClick(handlePtr, 782, 212);
-                Delay(3000);
-                
+                for (int i = 0; i < 5; i++)
+                {
+                    mouseLeftClick(handlePtr, tempPt.X, tempPt.Y);
+                    Delay(3000);
+                    Debug.Write("도감 완료 클릭");
+                }
             }
+
+            tempBmp.Dispose();
 
 
             mouseLeftClick(handlePtr, 300, 100);            // 사냥 클릭;
