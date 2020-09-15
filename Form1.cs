@@ -681,7 +681,7 @@ namespace 바람연
             Color temp;
 
 
-            temp = bmp.GetPixel(58, 38);
+            temp = bmp.GetPixel(58, 36);
 
             if(!((temp.R == 180) && (temp.G == 43) && (temp.B == 0)))
             {
