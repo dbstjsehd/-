@@ -322,7 +322,7 @@ namespace 바람연
                     {
                         mouseLeftClick(handlePtr, tempPt.X, tempPt.Y);
                         Delay(3000);
-                        Debug.Write("도감 완료 클릭");
+                        Debug.Write("도감 완료 ");
                     }
 
                     Debug.WriteLine("얍얍");
