@@ -973,8 +973,8 @@ namespace 웨어하우스
             RegisterHotKey(this.Handle, (int)HOTKEY.F2, 0, Keys.F2.GetHashCode());
             //RegisterHotKey(this.Handle, (int)HOTKEY.F7, 0, Keys.F7.GetHashCode());
             //RegisterHotKey(this.Handle, (int)HOTKEY.F5, 0, Keys.F5.GetHashCode());
-            RegisterHotKey(this.Handle, (int)HOTKEY.HOME, 0, Keys.Home.GetHashCode());
-            RegisterHotKey(this.Handle, (int)HOTKEY.END, 0, Keys.End.GetHashCode());
+            //RegisterHotKey(this.Handle, (int)HOTKEY.HOME, 0, Keys.Home.GetHashCode());
+            //RegisterHotKey(this.Handle, (int)HOTKEY.END, 0, Keys.End.GetHashCode());
             //RegisterHotKey(this.Handle, (int)HOTKEY.PAGEDOWN, 0, Keys.PageDown.GetHashCode());
             captureRectangle = Screen.AllScreens[0].Bounds;
 
