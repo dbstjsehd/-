@@ -1,4 +1,4 @@
-﻿using OpenCvSharp;
+using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -39,7 +39,7 @@ namespace 바람연
         internal static extern bool RegisterHotKey(IntPtr hWnd, int id, int fsModifiers, int vk);
         #endregion
 
-
+        private IntPtr controlPtr;
         private IntPtr gamePtr;
         private IntPtr handlePtr;
         private IntPtr handlePtr2;
@@ -87,6 +87,7 @@ namespace 바람연
         Bitmap 도감장소bmp;
         Bitmap 하위목록bmp;
         Bitmap 대장간bmp;
+        Bitmap esc_타이틀;
 
 
 
@@ -102,6 +103,7 @@ namespace 바람연
                 도감장소bmp = new Bitmap(".\\search\\캡처.png");
                 하위목록bmp = new Bitmap(".\\img\\sub.png");
                 대장간bmp = new Bitmap(".\\img\\대장간.png");
+                esc_타이틀 = new Bitmap(".\\img\\esc\\타이틀이동.png");
             }
         }
 
@@ -220,6 +222,7 @@ namespace 바람연
 
             Debug.WriteLine("");
             Debug.WriteLine("이동끝");
+            escCheck();
         }
 
         private void 도감작()
@@ -262,6 +265,34 @@ namespace 바람연
                         if (handlePtr2 != null)
                         {
                             SetWindowPos(gamePtr, -2, 0, 0, gameWidth, gameHeight, 0x0002);
+
+
+                            IntPtr findPtr = IntPtr.Zero;
+                            while (true)
+                            {
+                                findPtr = FindWindowEx(IntPtr.Zero, (int)findPtr, "Qt5QWindowToolSaveBits", "Form");
+
+                                if (findPtr == IntPtr.Zero)
+                                {
+                                    this.Invoke(new ThreadStart(delegate ()
+                                    {
+                                        this.Text = "대기중";
+                                    }));
+                                    return;
+                                }
+
+                                RECT stRect = default(RECT);
+                                GetWindowRect(findPtr, ref stRect);
+
+                                if ((stRect.bottom - stRect.top) == 574)
+                                {
+                                    controlPtr = findPtr;
+                                    break;
+                                }
+
+
+
+                            }
                         }
                         else
                         {
@@ -322,7 +353,7 @@ namespace 바람연
                     {
                         mouseLeftClick(handlePtr, tempPt.X, tempPt.Y);
                         Delay(3000);
-                        Debug.Write("도감 완료 ");
+                        Debug.Write("도감 완료 클릭");
                     }
 
                     Debug.WriteLine("얍얍");
@@ -347,6 +378,7 @@ namespace 바람연
                             mouseLeftClick(handlePtr, 420, 300);          //걸어가기 버튼 누르기
                             Delay(1000);
                             자동이동대기();
+                            
                             mouseLeftClick(handlePtr, 918, 318);          //오토 누르기
                             Delay(500);
                             PostMessage(handlePtr, 0x0201, new IntPtr(0x0001), new IntPtr((426 << 16) | (152 & 0xFFFF)));
@@ -446,7 +478,7 @@ namespace 바람연
 
                 if (searchIMG(repairBmp,수리bmp,ref tempPt) > 0.8)
                 {
-                    
+                    Debug.WriteLine("수리 필요");
                     mouseLeftClick(handlePtr, tempPt.X + 수리RECT.left, tempPt.Y + 수리RECT.top);          // 수리 버튼 클릭
                     Delay(1000);
                     자동이동대기();
@@ -503,6 +535,9 @@ namespace 바람연
             Delay(1000);
             mouseLeftClick(handlePtr, 727, 356);            // 도감 클릭;
             Delay(5000);
+
+            Bitmap tempBmp = getBmp(handlePtr);
+
             if (searchIMG(tempBmp, 완성bmp, ref tempPt) > 0.8)
             {
                 for (int i = 0; i < 5; i++)
@@ -514,7 +549,6 @@ namespace 바람연
             }
 
             tempBmp.Dispose();
-
 
             mouseLeftClick(handlePtr, 300, 100);            // 사냥 클릭;
             Delay(5000);
@@ -546,13 +580,13 @@ namespace 바람연
 
             for(int i = 0; i < 25; i++)
             {
-                Bitmap tempBmp = getBmp(handlePtr);
+                tempBmp = getBmp(handlePtr);
                 if(searchIMG(tempBmp,도감장소bmp,ref tempPt) > 0.9)
                 {
-                    
+                    Debug.WriteLine("도감찾음");
                     Delay(1000);
                     Bitmap tempBmp2 = getBmp(handlePtr);
-                    if(searchIMG(tempBmp2,도감장소bmp,ref tempPt) > 0.9)
+                    if(searchIMG(tempBmp2,도감장소bmp,ref tempPt) > 0.8)
                     {
                         RECT 하위RECT = new RECT();
                         {
@@ -564,7 +598,7 @@ namespace 바람연
                         Bitmap tempBmp3 = cropImage(tempBmp2, 하위RECT);
                         if(searchIMG(tempBmp3,하위목록bmp,ref tempPt) > 0.8)
                         {
-                            
+                            Debug.WriteLine("하위목록 찾음");
                             mouseLeftClick(handlePtr, 393, tempPt.Y+하위RECT.top);
                             Delay(2000);
 
@@ -681,15 +715,20 @@ namespace 바람연
             Color temp;
 
 
-            temp = bmp.GetPixel(58, 36);
+            temp = bmp.GetPixel(58, 36);            //체력 체크
 
             if(!((temp.R == 180) && (temp.G == 43) && (temp.B == 0)))
             {
                 return false;
             }
-            
+            temp = bmp.GetPixel(58,49);                  //마력 체크
+            if (!((temp.R == 50) && (temp.G == 105) && (temp.B == 228)))
+            {
+                return false;
+            }
 
-            for(int x = 47; x <= 48; x++)
+
+            for (int x = 47; x <= 48; x++)
             {
                 for(int y = 190; y <= 200; y++)
                 {
@@ -723,7 +762,7 @@ namespace 바람연
                     OpenCvSharp.Point minloc, maxloc;
                     //찾은 이미지의 유사도 및 위치 값을 받습니다. 
                     Cv2.MinMaxLoc(res, out minval, out maxval, out minloc, out maxloc);
-                    
+                    Debug.WriteLine("찾은 이미지의 유사도 : " + maxval);
 
                     //이미지를 찾았을 경우 클릭이벤트를 발생!!
                     pt.X = maxloc.X;
@@ -744,6 +783,34 @@ namespace 바람연
             Debug.WriteLine("시작");
             POINT tempPt = new POINT();
             gamePtr = FindWindow(null, "NoxPlayer");
+
+            IntPtr findPtr = IntPtr.Zero;
+            while (true)
+            {
+                findPtr = FindWindowEx(IntPtr.Zero, (int)findPtr, "Qt5QWindowToolSaveBits", "Form");
+
+                if(findPtr == IntPtr.Zero)
+                {
+                    MessageBox.Show("error");
+                    return;
+                }
+
+                RECT stRect = default(RECT);
+                GetWindowRect(findPtr, ref stRect);
+
+                if((stRect.bottom - stRect.top) == 574)
+                {
+                    controlPtr = findPtr;
+                    break;
+                }
+
+                
+
+            }
+
+
+            Debug.WriteLine("컨트롤 ptr : " + controlPtr);
+
             if(gamePtr != null)
             {
                 handlePtr = FindWindowEx(gamePtr, 0, "Qt5QWindowIcon", "ScreenBoardClassWindow");
@@ -753,8 +820,11 @@ namespace 바람연
                     if (handlePtr2 != null)
                     {
                         Bitmap temp = getBmp(handlePtr);
-                        temp.Save("asd.png");
+                        temp.Save("temp.png");
+
                         
+
+
                     }
                     else
                     {
@@ -798,6 +868,7 @@ namespace 바람연
 
             PostMessage(handle, 0x0202, new IntPtr(0), new IntPtr((y2 << 16) | ((x-1) & 0xFFFF)));
             PostMessage(handle, 0x0202, new IntPtr(0), new IntPtr((y2 << 16) | ((x - 1) & 0xFFFF)));
+            Delay(100);
         }
 
         private void mouseYDrag(IntPtr handle, int x,int y1, int y2)
@@ -878,6 +949,42 @@ namespace 바람연
             {
                 MessageBox.Show("error");
             }
+
+            
+        }
+
+
+        internal void escCheck()
+        {
+            POINT pt = new POINT();
+
+            while (true)
+            {
+
+                Bitmap temp = getBmp(handlePtr);
+
+                if (searchIMG(temp, esc_타이틀, ref pt)> 0.9)
+                {
+                    mouseLeftClick(handlePtr, 418, 321);
+                    temp.Dispose();
+                    Delay(200);
+                    break;
+                }
+                else
+                {
+                    PostMessage(controlPtr, 0x100, (IntPtr)0x1b, IntPtr.Zero);
+                    PostMessage(controlPtr, 0x101, (IntPtr)0x1b, IntPtr.Zero);
+                    Delay(200);
+                }
+
+                temp.Dispose();
+            }
+
+
+
+
+
+
 
             
         }
